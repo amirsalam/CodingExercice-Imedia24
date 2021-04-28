@@ -1,35 +1,59 @@
-import React from 'react'
+import React from 'react';
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button' ;
 
-function InformatonPokemon() {
+import { useQuery } from '@apollo/react-hooks';
+import gql from "graphql-tag";
+
+function InformatonPokemon(props) {
+
+
+  const GET_POKEMON_INFO = gql`
+  query samplePokeAPIquery {
+    gen3_species: pokemon_v2_pokemonspecies(where: {pokemon_v2_generation: {name: {_eq: "generation-iii"}, pokemon_v2_abilities: {}}}, order_by: {id: asc}) {
+      name
+      id
+  }
+  }
+  `
+
+  const { data, loading, error } = useQuery(GET_POKEMON_INFO);
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error</p>;
+  
+
+
+  
     return (
-        <div>
-            <!-- Button trigger modal -->
-            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#modelId">
-              Launch
-            </button>
-            
-            <!-- Modal -->
-            <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Modal title</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                        </div>
-                        <div class="modal-body">
-                            Body
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary">Save</button>
-                        </div>
-                    </div>
-                </div>
+        <Modal
+          {...props}
+          size="lg"
+          aria-labelledby="contained-modal-title-vcenter"
+          centered
+        >
+          <Modal.Header closeButton>
+            <Modal.Title id="contained-modal-title-vcenter">
+              More Information at Pokemon
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+          <div className="container">
+      {data.gen3_species.map((pokemon, index) => (
+          <div key={index} className="card">
+            <div class="card-body">
+              <h3>{pokemon.name}</h3>
             </div>
-        </div>
-    )
-}
+          </div>
+        ))}
+    </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={props.onHide}>Close</Button>
+          </Modal.Footer>
+        </Modal>
+      );
+    }   
+
+
 
 export default InformatonPokemon
